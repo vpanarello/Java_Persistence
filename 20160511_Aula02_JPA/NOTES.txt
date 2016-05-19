@@ -1,0 +1,16 @@
+##Notas
+
+Start MySql Server
+
+- Open command line and write
+>net start mysql56
+
+#JavaBeans (encapsulamento para envio da rede)
+- Implementar Serializable
+- Métodos privados
+- Implementar construtor padrão
+
+#DAO - Data Access Object
+
+# Java Database Connectivity (JDBC)
+  Aplicação > JDBC > Banco

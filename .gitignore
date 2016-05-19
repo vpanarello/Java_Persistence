@@ -1,0 +1,6 @@
+#folder to be ignored by Git application
+
+required/
+RemoteSystemsTempFiles/
+.recommenders/
+.metadata/

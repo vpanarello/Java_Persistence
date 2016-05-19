@@ -1,0 +1,4 @@
+#folder to be ignored by Git application
+
+lib/
+bin/
