@@ -3,18 +3,14 @@
  */
 package application;
 
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 
-import javax.persistence.EntityManager;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
-import dao.Dao;
-import dao.GenericDao;
-import dao.JpaUtil;
-import entity.Agenda;
-import entity.Matmed;
-import entity.Paciente;
-import entity.Procedimento;
+import dao.*;
+import entity.*;
+
 
 /**
  * 20160518-Exercise03-JPA / Main.java
@@ -31,109 +27,223 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		scan = new Scanner(System.in);
-		selectedEntity = 1;
-		
 		daoAgenda = new GenericDao<>(Agenda.class);
 		daoPaciente = new GenericDao<>(Paciente.class);
 		daoProcedimento = new GenericDao<>(Procedimento.class);
 		daoMatmed = new GenericDao<>(Matmed.class);
 		
-		Date d = new Date(2016, 05, 17, 18, 10);
-		Agenda agenda = new Agenda(d, d,  "Adição de teste do JPA");
-		
-		daoAgenda.adicionar(agenda);
 		
 		
-		menu01();
-		
+		commandMenu();
 		
 		
 	}
 	
-	public static void menu01(){	
-		System.out.println("1: adicionar, 2: listar");	
-		String text = scan.nextLine();
-		switch(text.toLowerCase()){
-		case "1":
-			qualEntidade();
-			adicionarRegistro(selectedEntity);
-
-
+	
+	public static void commandMenu(){
+		
+		printHelp();
+		
+		boolean exit = true;
+		do {
+			System.out.print("digite comando > ");
+			Scanner keyboard = new Scanner(System.in);
+			switch(keyboard.nextLine()){
+			case "cadastra agenda":
+				
+				cadastra(tipoCad.AGENDA);
+				break;
+			case "cadastra paciente":
+				cadastra(tipoCad.PACIENTE);
+				break;
+			case "vincula ap": // vincula agenda-paciente
+				
+				break;
+			case "cadastra procedimento":
+				cadastra(tipoCad.PROCEDIMENTO);
+				break;
+			case "cadastra matmed":
+				cadastra(tipoCad.MATMED);
+				break;
+			case "lista agenda":
+				
+				break;
+			case "lista paciente":
+	
+				break;
+			case "lista procediemento":
+				
+				
+				break;
+			case "lista matmed":
+				
+				
+				break;
+			case "help":
+				printHelp();
+				break;
+			case "sair":
+				exit = false;
+			}
+		} while (exit);
+		
+	}
+	
+	public enum tipoCad {
+		AGENDA, PACIENTE, PROCEDIMENTO, MATMED, VINCULA_PACIENTE_AGENDA;
+	}
+	
+	public static void cadastra(tipoCad tipo){
+		
+		switch(tipo){
+		case AGENDA:
+			System.out.println("> Agenda");
+			{
+			String input = JOptionPane.showInputDialog("Insira Agenda: DATA (dd/mm/yy), DESCRIÇÃO, HORA (hh:mm)");
 			
-			break;
-		case "2": // listar
-			qualEntidade();
-			listar(selectedEntity);
+			String[] args = input.split(", ");
+			String[] strDate = args[0].split("/");
+			String[] strHora = args[2].split(":");
 			
+			int dia = Integer.valueOf(strDate[0]);
+			int mes = Integer.valueOf(strDate[1]) - 1;
+			int ano = Integer.valueOf(strDate[2]);
+			
+			int hora = Integer.valueOf(strHora[0]);
+			int min = Integer.valueOf(strHora[1]);
+				
+			Date d = new Date(ano, mes, dia, hora, min);
+			
+			daoAgenda.adicionar(new Agenda(d, d, args[1]));
+			}
 			break;
-		default:
+			
+		case PACIENTE:
+			{
+			System.out.println("> Paciente");
+			
+			String input = JOptionPane.showInputDialog("Insira Paciente: CPF, NOME, DATANASC (dd/mm/yy), TELEFONE");
+			
+			String[] args = input.split(", ");
+			String[] strDate = args[2].split("/");
+			
+			int dia = Integer.valueOf(strDate[0]);
+			int mes = Integer.valueOf(strDate[1]) - 1;
+			int ano = Integer.valueOf(strDate[2]);
+			
+			daoPaciente.adicionar(new Paciente(args[0], args[1], new Date(ano, mes, dia), args[3]));
+			}
+			break;	
+		case PROCEDIMENTO:
+			{
+			System.out.println("> Procedimento");
+			
+			List<Paciente> pacientes = daoPaciente.listar();
+			
+			 JFrame frame = new JFrame();
+			 String bigList[] = new String[pacientes.size()];
+			 
+			 int i = 0;
+			 for (Paciente paciente : pacientes) {
+				 bigList[i] = paciente.getCPF() + " - " + paciente.getNome();
+				 i++;
+				}
+			 String[] key = JOptionPane.showInputDialog(frame, "Selecione Paciente", "Input", JOptionPane.QUESTION_MESSAGE,null, bigList, "Titan").toString().split(" - ");
+			 
+	
+			String input = JOptionPane.showInputDialog("Insira Procedimento: DESCRIÇÃO, PREÇO");
+			String[] args = input.split(", ");
+			
+			Paciente keyPaciente = null;
+			for (Paciente paciente : pacientes) {
+	 
+				 if(paciente.getCPF().equals(key[0])){
+					 keyPaciente = paciente;
+					 break;
+				 }
+				}
+			
+			daoProcedimento.adicionar(new Procedimento(args[0], Double.valueOf(args[1]),keyPaciente));
+			}
+			break;
+			
+		case MATMED:
+			{
+			System.out.println("> MatMed");
+			
+			List<Paciente> pacientes = daoPaciente.listar();
+			
+			 JFrame frame = new JFrame();
+			 String bigList[] = new String[pacientes.size()];
+			 
+			 int i = 0;
+			 for (Paciente paciente : pacientes) {
+				 bigList[i] = paciente.getCPF() + " - " + paciente.getNome();
+				 i++;
+				}
+			 String[] key = JOptionPane.showInputDialog(frame, "Selecione Paciente", "Input", JOptionPane.QUESTION_MESSAGE,null, bigList, "Titan").toString().split(" - ");
+			 
+	
+			String input = JOptionPane.showInputDialog("Insira MatMed: DESCRIÇÃO, FABRICANTE, PREÇO");
+			String[] args = input.split(", ");
+			
+			Paciente keyPaciente = null;
+			for (Paciente paciente : pacientes) {
+	 
+				 if(paciente.getCPF().equals(key[0])){
+					 keyPaciente = paciente;
+					 break;
+				 }
+				}
+			daoMatmed.adicionar(new Matmed(args[0], Double.valueOf(args[2]), args[1], keyPaciente));
+			
+			}
+			break;
+			
+		case VINCULA_PACIENTE_AGENDA:
+		{
+			
+			
+			
+		}
+			break;
+	
 		}	
-	}
-	
-	public static void qualEntidade(){
-		System.out.println("Qual Entidade? (1-Agenda, 2-Paciente, 3-Procedimento,4-Matmet )");
-		String text = scan.nextLine();
-		selectedEntity = Integer.valueOf(text);	
-	}
-	
-	public static void adicionarRegistro(int item){
 		
-		switch(item){
-		case 1:
-			System.out.println("Adicionar registro em Agenda");
-			System.out.println("Digite: ");
-			String text = scan.nextLine();
-			
-			
-			daoPaciente.adicionar(new Paciente(cPF, nome, dataNascimento, telefone, agendas));
-				
-			break;
-		case 2:
-			for(Paciente pa : daoPaciente.listar()){
-				System.out.println(pa.toString());
-			}
-			break;
-		case 3:
-			for(Procedimento pr : daoProcedimento.listar()){
-				System.out.println(pr.toString());
-			}
-			break;
-		case 4:
-			for(Matmed mm : daoMatmed.listar()){
-				System.out.println(mm.toString());
-			}
-			break;
-		}
 	}
 	
 	
-	
-	public static void listar(int item){
+	public static void printHelp(){
 		
-		switch(item){
-		case 1:
-			for(Agenda a : daoAgenda.listar()){
-				System.out.println(a.toString());
-			}	
-			break;
-		case 2:
-			for(Paciente pa : daoPaciente.listar()){
-				System.out.println(pa.toString());
-			}
-			break;
-		case 3:
-			for(Procedimento pr : daoProcedimento.listar()){
-				System.out.println(pr.toString());
-			}
-			break;
-		case 4:
-			for(Matmed mm : daoMatmed.listar()){
-				System.out.println(mm.toString());
-			}
-			break;
-		}
-				
+		System.out.println("");
+		System.out.printf("Digite:%n"
+				+ "cadastra agenda%n"
+				+ "vincula ap%n"
+				+ "cadastra procedimento%n"
+				+ "cadastra matmed%n"
+				+ "lista agenda%n"
+				+ "lista paciente%n"
+				+ "lista procediemento%n"
+				+ "lista matmed%n"
+				+ "help%n"
+				+ "sair%n%n");
+		
 	}
-
+	
 }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+

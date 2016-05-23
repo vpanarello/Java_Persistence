@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 public class JpaUtil {
 
-	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("ex03_jpa");
+	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("Ex03_jpa");
 
 	public static EntityManager getEntityManager(){
 		return emf.createEntityManager(); 

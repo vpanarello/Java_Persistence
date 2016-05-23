@@ -54,13 +54,12 @@ public class Paciente implements Serializable {
 	 * @param telefone
 	 * @param agendas
 	 */
-	public Paciente(String cPF, String nome, Date dataNascimento, String telefone, Set<Agenda> agendas) {
+	public Paciente(String cPF, String nome, Date dataNascimento, String telefone) {
 		super();
 		CPF = cPF;
 		this.nome = nome;
 		this.dataNascimento = dataNascimento;
 		this.telefone = telefone;
-		this.agendas = agendas;
 	}
 
 	public String getCPF() {

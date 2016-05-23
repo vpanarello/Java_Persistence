@@ -44,7 +44,7 @@ public class Procedimento implements Serializable {
 		super();
 		this.descricao = descricao;
 		this.preco = preco;
-		this.paciente = paciente;
+		this.paciente =  paciente;
 	}
 
 	public int getId() {
